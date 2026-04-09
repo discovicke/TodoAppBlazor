@@ -15,11 +15,13 @@
         <div class="todo-item">
             <input class="todo-input"
                    @bind="todo.Text"
+                   @bind:after="() => SendUpdate(todo)"
                    disabled="@todo.IsDone"
                    style=""/>
             <input type="checkbox"
                    class="todo-checkbox"
                    @bind="todo.IsDone"
+                   @bind:after="() => SendUpdate(todo)"
                    disabled="@todo.IsDone"/>
         </div>
     }
@@ -41,7 +43,7 @@
 
         hubConnection.On<Todo>("UpdateTodo", (todo) =>
         {
-            var existing = todos.FirstOrDefault(t => t.Text == todo.Text);
+            var existing = todos.FirstOrDefault(t => t.Id == todo.Id);
             if (existing != null)
             {
                 existing.IsDone = todo.IsDone;
@@ -57,11 +59,11 @@
         await hubConnection.StartAsync();
     }
     
-    private async Task OnTodoChanged(int index)
+    private async Task SendUpdate(Todo todo)
     {
         if (hubConnection is not null)
         {
-            await hubConnection.SendAsync("UpdateTodo", todos[index]);
+            await hubConnection.SendAsync("UpdateTodo", todo);
         }
     }
     
@@ -69,14 +71,12 @@
     {
         var newTodo = new Todo();
         todos.Add(newTodo);
-        if (hubConnection is not null)
-        {
-            await hubConnection.SendAsync("UpdateTodo", newTodo);
-        }
+        await SendUpdate(newTodo);
     }
 
     public class Todo
     {
+        public Guid Id { get; set; } = Guid.NewGuid();
         public string Text { get; set; } = "";
         public bool IsDone { get; set; } = false;
     }

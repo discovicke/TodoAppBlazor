@@ -4,7 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 builder.Services.AddSignalR();
-builder.Services.AddSingleton<TodoHub>();
+builder.Services.AddSingleton<TodoService>();
 
 builder.Services.AddCors(options =>
 {
@@ -31,6 +31,6 @@ app.UseHttpsRedirection();
 app.UseCors();
 
 app.MapHub<TodoHub>("/todohub");
-app.MapGet("/todos", (TodoHub hub) => hub.TodoItems);
+app.MapGet("/todos", (TodoService service) => service.TodoItems);
 
 app.Run();
