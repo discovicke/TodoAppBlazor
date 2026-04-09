@@ -1,0 +1,6 @@
+@TodoAppBlazor.Server_HostAddress = http://localhost:5193
+
+GET {{TodoAppBlazor.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
